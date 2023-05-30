@@ -1,0 +1,286 @@
+
+package ui;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.border.MatteBorder;
+
+import dao.GuiEmailDAO;
+
+/**
+ *
+ * @author 1805v
+ */
+public class GuiEmailChoNhanVien extends javax.swing.JPanel {
+
+	/**
+	 * Creates new form GuiEmailChoNhanVien
+	 */
+
+	private List<File> danhSachTepDinhKem;
+	private String emailNhanVien;
+	private GuiEmailDAO guiEmailDAO;
+
+	public GuiEmailChoNhanVien(String emailNhanVien) {
+		this.emailNhanVien = emailNhanVien;
+		guiEmailDAO = new GuiEmailDAO();
+		danhSachTepDinhKem = new ArrayList<>();
+        initComponents();
+        themSuKien();
+		
+	}
+	
+	
+	private void themSuKien() {
+
+		 txtEmailNhan.setText(emailNhanVien);
+         txtEmailNhan.setEditable(false);
+         txtNoiDung.setText("Chào bạn [Tên nhân viên], tôi là [Chức danh], [Thông tin liên hệ]\n"
+         		+ "\n"
+         		+ "Tôi hy vọng email này tìm thấy bạn trong tình trạng tốt đẹp. \n"
+         		+ "\n"
+         		+ "Mô tả nhiệm vụ:\n"
+         		+ "[Đưa ra mô tả rõ ràng và ngắn gọn về nhiệm vụ. Xác định mục tiêu, đối tượng và bất kỳ hướng dẫn hoặc yêu cầu cụ thể nào.]\n"
+         		+ "\n"
+         		+ "Hạn chót:\n"
+         		+ "[Xác định thời hạn nhiệm vụ cần hoàn thành.]\n"
+         		+ "\n"
+         		+ "Kỳ vọng:\n"
+         		+ "[Tổng quan về kỳ vọng đối với nhiệm vụ, bao gồm kết quả mong muốn, tiêu chuẩn chất lượng và bất kỳ tiêu chí quan trọng nào khác.]\n"
+         		+ "\n"
+         		+ "Nếu bạn có bất kỳ câu hỏi nào hoặc cần thêm thông tin về nhiệm vụ, xin vui lòng liên hệ với tôi. Tôi sẵn lòng cung cấp mọi sự hỗ trợ hoặc hướng dẫn mà bạn cần.\n"
+         		+ "\n"
+         		+ "Vui lòng xác nhận đã nhận được email này và xác nhận việc hiểu nhiệm vụ được giao. Tôi tin tưởng vào kỹ năng và khả năng của bạn để hoàn thành nhiệm vụ này thành công và tôi tin rằng bạn sẽ mang lại kết quả xuất sắc.\n"
+         		+ "\n"
+         		+ "Cảm ơn bạn vì sự cống hiến và cam kết của bạn đối với công việc. Tôi đánh giá cao những nỗ lực của bạn và mong chờ kết quả của nhiệm vụ này.\n"
+         		+ "\n"
+         		+ "Trân trọng,\n"
+         		+ "\n"
+         		+ "[Tên của bạn]\n"
+         		+ "\n"
+         		+ "");
+         
+        txtNoiDung.setEditable(true);
+        
+        
+        
+        txtChuDe.setText("Chủ đề: Giao nhiệm vụ - [Chức danh công việc]");
+        txtChuDe.setEditable(true);
+    	btnDinhKem.addActionListener(new ActionListener() {
+
+        public void actionPerformed(ActionEvent e) {
+           
+              JFileChooser fileChooser = new JFileChooser();
+                int result = fileChooser.showOpenDialog(GuiEmailChoNhanVien.this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    danhSachTepDinhKem.add(selectedFile);
+                    
+                    
+                  
+                    
+                    
+                }
+                String noiDungTepDinhKem = null;
+                if(danhSachTepDinhKem.size() != 0)
+                {
+                	for(File tep : danhSachTepDinhKem) {
+                	 noiDungTepDinhKem = tep.getName() + ",";
+                	
+                	}
+                	
+                }
+                
+                txtNoiDungTepDinhKem.setText(noiDungTepDinhKem);
+                
+			}});
+    	
+    
+    	
+    	btnGui.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+               
+            	//!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+            
+            	if(!emailNhanVien.equals("")) {
+                    String chuDe = txtChuDe.getText().toString();
+                    String noiDung = txtNoiDung.getText().toString();
+                    
+                    
+                    txtEmailNhan.setText(emailNhanVien);
+                    txtEmailNhan.setEditable(false);
+                    
+                    try {
+						if(guiEmailDAO.sendEmail(emailNhanVien, chuDe, noiDung, danhSachTepDinhKem))
+						{
+							JOptionPane.showMessageDialog(null, "Gửi thành công");
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Gửi thất bại");
+						}
+						
+					} catch (IOException e1) {
+						
+						e1.printStackTrace();
+					}
+            	}
+            	else {
+						JOptionPane.showMessageDialog(null, "Người nhận không tồn tại/Chưa chọn người nhận");
+            	}
+                    
+                    
+                    
+                   
+    			}
+        });
+            
+            
+        
+        
+        
+		
+	}
+
+	/**
+	 * This method is called from within the constructor to initialize the form.
+	 * WARNING: Do NOT modify this code. The content of this method is always
+	 * regenerated by the Form Editor.
+	 */
+	@SuppressWarnings("unchecked")
+	// <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel1 = new javax.swing.JLabel();
+        txtEmailNhan = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtChuDe = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtNoiDung = new javax.swing.JTextArea();
+        btnGui = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        btnDinhKem = new javax.swing.JButton();
+        txtNoiDungTepDinhKem = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setBackground(java.awt.Color.white);
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel1.setText("Người nhận: ");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(128, 123, -1, -1));
+
+        txtEmailNhan.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtEmailNhan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtEmailNhanActionPerformed(evt);
+            }
+        });
+        txtEmailNhan.setBorder(new MatteBorder(0, 0, 1, 0, Color.BLACK));
+        add(txtEmailNhan, new org.netbeans.lib.awtextra.AbsoluteConstraints(258, 123, 300, -1));
+
+        jLabel4.setBackground(java.awt.Color.white);
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel4.setText("Chủ đề:");
+        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(128, 169, -1, -1));
+
+        txtChuDe.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        add(txtChuDe, new org.netbeans.lib.awtextra.AbsoluteConstraints(258, 169, 610, -1));
+
+        jScrollPane1.setBackground(java.awt.Color.white);
+
+        txtNoiDung.setColumns(20);
+        txtNoiDung.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtNoiDung.setRows(5);
+        jScrollPane1.setViewportView(txtNoiDung);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(258, 225, 610, 410));
+
+        btnGui.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnGui.setText("Gửi");
+        btnGui.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuiActionPerformed(evt);
+            }
+        });
+        add(btnGui, new org.netbeans.lib.awtextra.AbsoluteConstraints(548, 735, -1, -1));
+
+        jLabel11.setBackground(java.awt.Color.white);
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel11.setText("Nội dung:");
+        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(128, 225, -1, -1));
+
+        btnDinhKem.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnDinhKem.setText("Chọn tệp đính kèm");
+        btnDinhKem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDinhKemActionPerformed(evt);
+            }
+        });
+        add(btnDinhKem, new org.netbeans.lib.awtextra.AbsoluteConstraints(257, 667, -1, -1));
+
+        txtNoiDungTepDinhKem.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        add(txtNoiDungTepDinhKem, new org.netbeans.lib.awtextra.AbsoluteConstraints(457, 667, 409, -1));
+
+        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        jLabel2.setText("Tin nhắn mới");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(413, 413, 413)
+                .addComponent(jLabel2)
+                .addContainerGap(412, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
+        );
+
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 70));
+    }// </editor-fold>//GEN-END:initComponents
+
+	private void txtEmailNhanActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtEmailNhanActionPerformed
+		// TODO add your handling code here:
+	}// GEN-LAST:event_txtEmailNhanActionPerformed
+
+	private void btnGuiActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGuiActionPerformed
+
+	}// GEN-LAST:event_btnGuiActionPerformed
+
+	private void btnDinhKemActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDinhKemActionPerformed
+
+	}// GEN-LAST:event_btnDinhKemActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDinhKem;
+    private javax.swing.JButton btnGui;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField txtChuDe;
+    private javax.swing.JTextField txtEmailNhan;
+    private javax.swing.JTextArea txtNoiDung;
+    private javax.swing.JTextField txtNoiDungTepDinhKem;
+    // End of variables declaration//GEN-END:variables
+}
